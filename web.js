@@ -3,6 +3,7 @@ var express = require('express');
 var logfmt = require('logfmt');
 var db = require('./db');
 var dates = require("./utils/dates");
+var rollbar = require('rollbar');
 require('dotenv').config();
 
 var app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.cookieParser(process.env.COOKIE_SECRET));
 app.use(express.cookieSession());
+app.use(rollbar.errorHandler(process.env.ROLLBAR_ACCESS_TOKEN));
 
 
 // Serve testing page on which you can impersonate Twilio
@@ -173,13 +175,19 @@ app.use(function (err, req, res, next) {
     // during development, return the trace to the client for
     // helpfulness
     console.log("Error: " + err.message);
+    rollbar.handleError(err);
     if (app.settings.env !== 'production') {
       return res.status(500).send(err.stack)
-    }
-
+    } 
+    
     return res.status(500).send('Sorry, internal server error')
   }
 });
+// Send all uncaught excpetions to Rollbar???
+var options = {
+  exitOnUncaughtException: true
+};
+rollbar.handleUncaughtExceptions(process.env.ROLLBAR_ACCESS_TOKEN, options);
 
 var port = Number(process.env.PORT || 5000);
 app.listen(port, function() {
