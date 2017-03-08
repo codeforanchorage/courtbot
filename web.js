@@ -78,7 +78,6 @@ function askedReminderMiddleware(req, res, next) {
 
 // Respond to text messages that come in from Twilio
 app.post('/sms', askedReminderMiddleware, function (req, res, next) {
-  return next(new Error('just a test'))
   var twiml = new twilio.TwimlResponse();
   var text = req.body.Body.toUpperCase();
 
