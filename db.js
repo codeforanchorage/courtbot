@@ -80,7 +80,7 @@ exports.addQueued = function(data) {
 };
 
 var escapeSQL = function(val) {
-  val.replace(/[\0\n\r\b\t\\\'\"\x1a]/g, function(s) {
+  return val.replace(/[\0\n\r\b\t\\\'\"\x1a]/g, function(s) {
     switch(s) {
       case "\0": return "\\0";
       case "\n": return "\\n";
@@ -91,5 +91,5 @@ var escapeSQL = function(val) {
       default: return "\\"+s;
     }
   });
-  return val;
+
 };
