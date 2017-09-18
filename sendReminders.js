@@ -5,7 +5,7 @@ const manager = require('./utils/db/manager');
 const messages = require('./utils/messages');
 const dates = require('./utils/dates');
 
-const knex = manager.knex();
+const knex = manager.knex;
 
 /**
  * Find all reminders with a case date of tomorrow for which a reminder has not been sent

@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const crypto = require('crypto');
 const manager = require("./utils/db/manager");
-const knex = manager.knex();
+const knex = manager.knex;
 const now = require("./utils/dates").now;
 
 exports.findCitation = function(citation) {

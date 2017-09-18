@@ -7,7 +7,7 @@ const strings = require('./utils/strings');
 const messages = require('./utils/messages');
 const manager = require('./utils/db/manager');
 
-const knex = manager.knex();
+const knex = manager.knex;
 
 /**
  * Retrieve array of queued messages that have not been sent, if any exist.

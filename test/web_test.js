@@ -13,7 +13,7 @@ const Session = require('supertest-session')({
 });
 
 const manager = require("../utils/db/manager");
-const knex = manager.knex();
+const knex = manager.knex;
 const dates = require("../utils/dates");
 const moment = require("moment-timezone");
 
