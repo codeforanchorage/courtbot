@@ -204,7 +204,7 @@ app.post('/sms', askedReminderMiddleware, (req, res, next) => {
 });
 
 // Error handling Middleware
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   if (!res.headersSent) {
     console.log('Error: ', err.message);
     rollbar.handleError(err, req);
