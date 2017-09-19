@@ -10,6 +10,12 @@ function escapeSQL(val) {
   return val.replace(/[^A-Za-z0-9\-]/g, '');
 }
 
+/**
+ * encrypts the phone number
+ *
+ * param {string} phone number to encrypt
+ * returns {string} encrypted phone number
+ */
 function encryptPhone(phone) {
   // Be careful when refactoring this function, the decipher object needs to be created
   //    each time a reminder is sent because the decipher.final() method destroys the object
@@ -18,6 +24,12 @@ function encryptPhone(phone) {
   return cipher.update(phone, 'utf8', 'hex') + cipher.final('hex');
 }
 
+/**
+ * decrypts the phone number
+ *
+ * param {string} phone number to decrypt
+ * returns {string} decrypted phone number
+ */
 function decryptPhone(phone) {
   // Be careful when refactoring this function, the decipher object needs to be created
   //    each time a reminder is sent because the decipher.final() method destroys the object
