@@ -182,8 +182,9 @@ app.post('/sms', askedReminderMiddleware, (req, res, next) => {
         if (correctLengthCitation) {
           twiml.sms(messages.notFoundAskToKeepLooking());
 
-          req.session.askedQueued = true;
           req.session.citationId = text;
+          req.session.askedQueued = true;
+          req.session.askedReminder = false;
         } else {
           twiml.sms(messages.invalidCaseNumber());
         }
@@ -196,6 +197,7 @@ app.post('/sms', askedReminderMiddleware, (req, res, next) => {
 
         req.session.match = match;
         req.session.askedReminder = true;
+        req.session.askedQueued = false;
       }
 
       res.send(twiml.toString());
