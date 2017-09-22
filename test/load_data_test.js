@@ -1,3 +1,4 @@
+'use strict';
 /* eslint "no-console": "off" */
 
 // see https://mochajs.org/#arrow-functions

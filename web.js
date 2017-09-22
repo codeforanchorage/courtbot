@@ -131,7 +131,7 @@ function askedReminderMiddleware(req, res, next) {
 
 // Respond to text messages that come in from Twilio
 app.post('/sms', askedReminderMiddleware, (req, res, next) => {
-  const twiml = new twilio.TwimlResponse();
+  const twiml = new twilio.twiml.MessagingResponse();
   const text = cleanupText(req.body.Body.toUpperCase());
   if (req.askedReminder) {
     if (isResponseYes(text)) {
@@ -141,13 +141,13 @@ app.post('/sms', askedReminderMiddleware, (req, res, next) => {
         originalCase: JSON.stringify(req.match),
       })
         .then(() => {
-          twiml.sms(messages.weWillRemindYou());
+          twiml.message(messages.weWillRemindYou());
           req.session.askedReminder = false;
           res.send(twiml.toString());
         })
         .catch(err => next(err));
     } else {
-      twiml.sms(messages.forMoreInfo());
+      twiml.message(messages.forMoreInfo());
       req.session.askedReminder = false;
       res.send(twiml.toString());
     }
@@ -161,14 +161,14 @@ app.post('/sms', askedReminderMiddleware, (req, res, next) => {
         phone: req.body.From,
       })
         .then(() => {
-          twiml.sms(messages.weWillKeepLooking());
+          twiml.message(messages.weWillKeepLooking());
           req.session.askedQueued = false;
           res.send(twiml.toString());
         })
         .catch(err => next(err));
       return;
     } else if (isResponseNo(text)) {
-      twiml.sms(messages.forMoreInfo());
+      twiml.message(messages.forMoreInfo());
       req.session.askedQueued = false;
       res.send(twiml.toString());
       return;
@@ -180,20 +180,20 @@ app.post('/sms', askedReminderMiddleware, (req, res, next) => {
       if (!results || results.length === 0 || results.length > 1) {
         const correctLengthCitation = text.length >= 6 && text.length <= 25;
         if (correctLengthCitation) {
-          twiml.sms(messages.notFoundAskToKeepLooking());
+          twiml.message(messages.notFoundAskToKeepLooking());
 
           req.session.citationId = text;
           req.session.askedQueued = true;
           req.session.askedReminder = false;
         } else {
-          twiml.sms(messages.invalidCaseNumber());
+          twiml.message(messages.invalidCaseNumber());
         }
       } else {
         const match = results[0];
         const name = cleanupName(match.defendant);
         const datetime = dates.fromUtc(match.date);
 
-        twiml.sms(messages.foundItAskForReminder(false, name, datetime, match.room));
+        twiml.message(messages.foundItAskForReminder(false, name, datetime, match.room));
 
         req.session.match = match;
         req.session.askedReminder = true;

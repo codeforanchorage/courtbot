@@ -38,6 +38,13 @@ module.exports = {
 		//console.log("Date: " + moment(dt).format("YYYY-MM-DD") + " Offset: " + tz);
 		return tz;
 	},
+    /**
+	 * Get a moment object for today at given hour (24hour), using our environment timezone.
+	 * @return {moment} moment object
+	 */
+    todayAtHour: function(hour) {
+        return moment.tz(moment(hour, 'HH'), process.env.TIMEZONE).utc()
+    },
 
 	/**
 	 * Get current moment timestamp, using our environment timezone.

@@ -1,7 +1,7 @@
 const twilio = require('twilio');
-const dates = require('./dates');
+const client = new twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const dates = require('./dates');
 
 /**
  * reduces whitespace to a single space
@@ -143,9 +143,11 @@ function weWillRemindYou() {
  * @return {Promise} Promise to send message.
  */
 function send(to, from, body) {
-  return new Promise((resolve) => {
-    client.sendMessage({ to, from, body }, resolve);
-  });
+    return client.messages.create({
+        body: body,
+        to: to,
+        from: from
+    })
 }
 
 module.exports = {
