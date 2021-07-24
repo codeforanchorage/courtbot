@@ -4,7 +4,7 @@
   "description": "Deliver simple court data via JSON or SMS.",
   "repository": {
     "type": "git",
-    "url": "git://github.com/codeforanchorage/courtbot.git"
+    "url": "git://github.com/https://github.com/CodeForAsheville/courtbot.git"
   },
   "main": "web.js",
   "scripts": {
