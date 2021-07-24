@@ -16,7 +16,7 @@
   "author": "Sam Hashemi",
   "license": "MIT",
   "engines": {
-    "node": "8.9.1"
+    "node": "15.14.0"
   },
   "dependencies": {
     "body-parser": "^1.18.3",
