@@ -8,6 +8,8 @@ const copyFrom = require('pg-copy-streams').from;
 const manager = require('./db/manager');
 const {HTTPError} = require('./errors')
 const CSV_DELIMITER = ',';
+const fs = require('fs')
+const path = require('path')
 
 const csv_headers = {
     criminal_cases: ['date', 'last', 'first', 'room', 'time', 'id', 'type'],
@@ -73,16 +75,22 @@ function loadCSV(client, url, csv_type){
     })
 
     return new Promise(async (resolve, reject) => {
+        let file
+        const reader = fs.createReadStream(path.join(__dirname, '..', '/test/fixtures/acs_mo_event.csv'))
+        reader.on('data', chunk => file += chunk)
+
         /*  Since we've transformed csv into [date, defendant, room, id] form, we can just pipe it to postgres */
         const copy_stream = client.query(copyFrom('COPY hearings_temp ("date", "defendant", "room", "case_id", "type") FROM STDIN CSV'));
         copy_stream.on('error', reject)
         copy_stream.on('end',  resolve)
 
-        request.get(url)
-        .on('response', function (res) {
-            if (res.statusCode !== 200) {
-              this.emit('error', new HTTPError("Error loading CSV. Return HTTP Status: "+res.statusCode))
-            }
+        //request.get(url)
+        reader
+        .on('end', function (res) {
+            console.log(res)
+            // if (res.statusCode !== 200) {
+            //   this.emit('error', new HTTPError("Error loading CSV. Return HTTP Status: "+res.statusCode))
+            // }
         })
         .on('error', reject)
         .pipe(parser)
