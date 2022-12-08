@@ -24,7 +24,7 @@
     "csv": "^5.3.2",
     "dotenv": "~4.0.0",
     "emoji-strip": "^1.0.1",
-    "express": "^4.16.3",
+    "express": "^4.17.3",
     "jsonwebtoken": "^8.3.0",
     "knex": "^2.3.0",
     "logfmt": "^1.2.1",
