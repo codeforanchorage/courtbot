@@ -19,12 +19,12 @@
     "node": "16.17.0"
   },
   "dependencies": {
-    "body-parser": "^1.18.3",
+    "body-parser": "^1.20.1",
     "cookie-session": "^2.0.0-beta.3",
     "csv": "^5.3.2",
     "dotenv": "~4.0.0",
     "emoji-strip": "^1.0.1",
-    "express": "^4.16.3",
+    "express": "^4.18.2",
     "jsonwebtoken": "^8.3.0",
     "knex": "^2.3.0",
     "logfmt": "^1.2.1",
