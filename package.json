@@ -26,7 +26,7 @@
     "emoji-strip": "^1.0.1",
     "express": "^4.18.2",
     "jsonwebtoken": "^8.3.0",
-    "knex": "^2.3.0",
+    "knex": "^2.4.0",
     "logfmt": "^1.2.1",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.37",
