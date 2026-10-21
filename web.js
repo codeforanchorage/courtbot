@@ -82,8 +82,11 @@ app.post('/sms',
     cleanupTextMiddelWare,
     stopMiddleware,
     deleteMiddleware,
-    yesNoMiddleware,
     currentRequestMiddleware,
+    referToCourtSystemMiddleware,
+    /* The sign-up flow below is intact but no longer reached. To bring CourtBot
+       sign-ups back, remove referToCourtSystemMiddleware from this chain. */
+    yesNoMiddleware,
     caseIdMiddleware,
     unservicableRequest
 );
@@ -118,6 +121,20 @@ function stopMiddleware(req, res, next){
         return res.sendStatus(200); // once stopped replies don't make it to the user
     })
     .catch(err => next(err));
+}
+
+/**
+ * The Alaska Court System now runs its own text hearing reminder service.
+ * Anything that is not managing an existing CourtBot subscription (STOP,
+ * DELETE, or a case the sender already follows) is pointed there instead of
+ * starting a new CourtBot sign-up.
+ */
+function referToCourtSystemMiddleware(req, res) {
+    res[action_symbol] = "refer_to_court_system"
+    req.session = null;
+    const twiml = new MessagingResponse();
+    twiml.message(messages.newServiceReferral());
+    res.send(twiml.toString());
 }
 
 /**

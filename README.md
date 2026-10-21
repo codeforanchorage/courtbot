@@ -1,5 +1,13 @@
 [![Build Status](https://travis-ci.org/codeforanchorage/courtbot.svg?branch=master)](https://travis-ci.org/codeforanchorage/courtbot)
 ## Courtbot
+
+> **Status (October 2026):** The Alaska Court System now runs its own text hearing reminder service
+> ([Court Guide Text Hearing Reminders](https://courts.alaska.gov/tos/court-guide-reminders-faq.htm):
+> text a case number to (575) 222-8484). CourtBot no longer starts new sign-ups. Any incoming text that
+> is not managing an existing subscription (STOP / DELETE) gets a reply pointing people to the court's
+> service. The sign-up code is still in place; see `referToCourtSystemMiddleware` in *web.js*.
+> Existing subscriptions keep receiving reminders from the daily runners.
+
 Courtbot is a simple web service for handling court case data. It offers a basic HTTP endpoint for integration with websites, and a set of advanced twilio workflows to handle text-based lookup.
 
 Specifically, the twilio features include:

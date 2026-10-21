@@ -6,17 +6,17 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Alaska CourtBot</title>
-        <meta property="og:title" content="Alaska CourtBot" />
+        <title>Alaska Court Hearing Text Reminders</title>
+        <meta property="og:title" content="Alaska Court Hearing Text Reminders" />
         <meta property="og:type" content="article" />
         <meta property="og:image" content="http://courtbot.codeforanchorage.org/img/phone_339x406.png" />
         <meta property="og:url" content="http://courtbot.codeforanchorage.org" />
-        <meta property="og:description" content="A free service that sends SMS reminders the evening before a court hearing" /> 
+        <meta property="og:description" content="The Alaska Court System sends free text reminders the afternoon before your court hearing. Text your case number to 575-222-8484." />
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content="Alaska CourtBot" />
-        <meta name="twitter:description" content="A free service that sends SMS reminders the evening before a court hearing" />
+        <meta name="twitter:title" content="Alaska Court Hearing Text Reminders" />
+        <meta name="twitter:description" content="The Alaska Court System sends free text reminders the afternoon before your court hearing. Text your case number to 575-222-8484." />
         <meta name="twitter:image" content="http://courtbot.codeforanchorage.org/img/phone_339x406.png" />
-        <meta name="description" content="A free service that sends SMS reminders the evening before a court hearing">
+        <meta name="description" content="The Alaska Court System sends free text reminders the afternoon before your court hearing. Text your case number to 575-222-8484.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://fonts.googleapis.com/css?family=Raleway:300,600,900" rel="stylesheet">
         <link rel="stylesheet" href="styles/styles.css">
@@ -37,43 +37,55 @@
             </div>
             <div id="title">
                 <h1 id="courtBotHeader">Alaska CourtBot</h1>
-                <h2>A free service that will send you a text message reminder the day before your court hearing.</h2>
+                <h2>CourtBot has been replaced. The Alaska Court System now sends its own free text message reminders the afternoon before your court hearing.</h2>
                 <h3>How it works:</h3>
                 <div id="howItWorks">
                     <p>
-                        Just text your case or ticket number to:
+                        Just text your case number to:
                         <br>
-                        <span id="phoneNumber">907-312-2700</span> <br>
-                        We will attempt to send you a reminder the evening before your court hearing. Case numbers are 14 characters long like: 1KE-19-01234MO. Ticket numbers can be 8 to 17 characters long, for example: KETEEP000123456.    
+                        <span id="phoneNumber">575-222-8484</span> <br>
+                        The court will text you back. Reply <b>YES</b> to confirm, and you will get a reminder the afternoon before each hearing with the hearing type, date, time, location, and a link to the details.
+                        Case numbers look like: 3AN-26-01234CI.
                     </p>
                     <div id="testcase">
-                        <h5>Curious how it works? Try it out in demo mode:</h5>
-                        <p>Text: <b>testcase</b><br/> To: 907-312-2700</p>
+                        <h5>Full instructions from the court:</h5>
+                        <p><a href="https://courts.alaska.gov/tos/court-guide-reminders-faq.htm">Court Guide Text Hearing Reminders FAQ</a></p>
                     </div>
                 </div>
-               
+
                 <h4>Frequently asked questions</h4>
                 <p class ="faq">
-                    <b>How do I turn off all notifications?</b><br />
-                    Reply to the message with "stop" and we will stop sending you notifications.
+                    <b>Who can sign up?</b><br />
+                    Anyone. You do not have to be a party or a lawyer in the case, and you can sign up for as many cases as you like.
                 </p>
                 <p class ="faq">
-                    <b>How do I turn off notifications for an individual case or ticket?</b><br />
-                    Text in the case or ticket number you are currently following to 1-907-312-2700 and the service will reply with the option to reply "DELETE" to stop notifications for that case or ticket.
+                    <b>How do I stop reminders for one case?</b><br />
+                    Text the case number to 575-222-8484. The court will reply that you are already subscribed. Reply "DELETE" and reminders for that case will stop. Other cases you follow are not affected.
                 </p>
                 <p class ="faq">
-                        <b>Do I still need to verify my court date?</b><br />
-                        Yes! Court dates change frequently, so you should always verify the date and time of your hearing by visiting the <a href="https://records.courts.alaska.gov">Alaska State Court System</a>.
+                    <b>How do I stop all hearing reminders?</b><br />
+                    Text "STOP" to 575-222-8484. To start again later, text "START" to 575-222-8484.
                 </p>
                 <p class ="faq">
-                        <b>Who maintains Alaska CourtBot</b><br />
-                        Alaska CourtBot is maintained by volunteers at Code for Anchorage, a brigade of Code for America. If you would like to be involved with this or similar projects, please visit: <a href="http://codeforanchorage.org">Code for Anchorage</a>.
+                    <b>I signed up but I am not getting texts. Why?</b><br />
+                    If you ever texted "STOP" to 34852, the court cannot text you at all. Text "START" to 34852 to allow texts from the court again.
+                </p>
+                <p class ="faq">
+                    <b>Do I still need to verify my court date?</b><br />
+                    Yes! Reminders are a courtesy service and court dates change frequently. Always verify the date and time of your hearing on <a href="https://records.courts.alaska.gov">CourtView</a> or by contacting your local court.
+                </p>
+                <p class ="faq">
+                    <b>I signed up with the old CourtBot number. What happens to my reminders?</b><br />
+                    CourtBot is no longer accepting new sign-ups. If you texted 907-312-2700 in the past, reply "STOP" to that number to end those reminders, then sign up with the court at 575-222-8484. The original CourtBot page is <a href="archive/">archived here</a>.
+                </p>
+                <p class ="faq">
+                    <b>Who made Alaska CourtBot?</b><br />
+                    Alaska CourtBot was built and maintained by volunteers at Code for Anchorage, a brigade of Code for America, until the Alaska Court System launched its own reminder service. If you would like to be involved with projects like this, please visit: <a href="http://codeforanchorage.org">Code for Anchorage</a>.
                 </p>
             </div>
         </div>
         <script>
             fitText(document.getElementById('courtBotHeader'), 0.9)
         </script>
-        <script src="" async defer></script>
     </body>
 </html>

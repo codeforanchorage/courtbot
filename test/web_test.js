@@ -10,6 +10,7 @@ const manager = require('../utils/db/manager');
 const moment = require('moment-timezone');
 const knex = manager.knex;
 const app = require('../web');
+const messages = require('../utils/messages');
 const session = require('supertest-session');
 
 const TEST_UTC_DATE = moment("2015-03-27T13:00:00").tz(process.env.TZ).format();
@@ -139,231 +140,84 @@ describe("POST /sms", function() {
         sess.destroy();
     });
 
-    context("without session set", function() {
-        context("with 1 matching court case", function() {
-            const params = { Body: " A4928456 ", From: "+12223334444"};
+    const referral = `<?xml version="1.0" encoding="UTF-8"?><Response><Message>${messages.newServiceReferral()}</Message></Response>`;
 
-            beforeEach(function() {
-                return knex('hearings').del()
-                .then(() => knex('hearings').insert([turnerData("", new_date)]))
-            });
-
-            it("says there is a court case and prompts for reminder", function(done) {
-                sess.post('/sms')
-                .send(params)
-                .expect(200)
-                .end(function(err, res) {
-                    if (err) return done(err);
-                    expect(res.text).to.equal(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>We found a case for Frederick Turner scheduled on ${new_date.format('ddd, MMM Do')} at ${new_date.format('h:mm A')}, at CNVCRT. Would you like a courtesy reminder the day before? (reply YES or NO)</Message></Response>`);
-                    done();
-                });
-            });
-
-            it("strips emojis from a text", function (done) {
-                sess.post('/sms')
-                .send({
-                    Body: 'A4928456 😁',
-                    From: "+12223334444"
-                })
-                .expect(200)
-                .end(function(err, res) {
-                    if(err) return done(err);
-                    expect(res.text).to.equal(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>We found a case for Frederick Turner scheduled on ${new_date.format('ddd, MMM Do')} at ${new_date.format('h:mm A')}, at CNVCRT. Would you like a courtesy reminder the day before? (reply YES or NO)</Message></Response>`);
-                    done();
-                });
-            });
-
-            it("strips everything after newlines and carriage returns from id", function (done) {
-                sess.post('/sms')
-                .send({
-                    Body: 'A4928456\r\n-Simon',
-                    From: "+12223334444"
-                })
-                .expect(200)
-                .end(function(err, res) {
-                    if(err) return done(err);
-                    expect(res.text).to.equal(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>We found a case for Frederick Turner scheduled on ${new_date.format('ddd, MMM Do')} at ${new_date.format('h:mm A')}, at CNVCRT. Would you like a courtesy reminder the day before? (reply YES or NO)</Message></Response>`);
-                    done();
-                });
-            });
-
-            it("strips everything after newlines and carriage returns from id", function (done) {
-                sess.post('/sms')
-                .send({
-                    Body: 'A4928456\n-Simon',
-                    From: "+12223334444"
-                })
-                .expect(200)
-                .end(function(err, res) {
-                    if(err) return done(err);
-                    expect(res.text).to.equal(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>We found a case for Frederick Turner scheduled on ${new_date.format('ddd, MMM Do')} at ${new_date.format('h:mm A')}, at CNVCRT. Would you like a courtesy reminder the day before? (reply YES or NO)</Message></Response>`);
-                    done();
-                });
-            });
-
-            it("sets case_id and known_case on session", function(done) {
-                sess.post('/sms')
-                .send(params)
-                .expect(200)
-                .end(function(err, res) {
-                    if (err)  return done(err);
-                    expect(getConnectCookie(sess).case_id).to.equal(params.Body.trim());
-                    expect(getConnectCookie(sess).known_case).to.be.true;
-                    done();
-                });
+    /* The Alaska Court System now runs its own text reminder service, so any
+       text that is not managing an existing subscription gets a referral. */
+    context("referring people to the court system's text reminders", function() {
+        it("replies with the referral for a known case and does not start a sign-up", function(done) {
+            sess.post('/sms')
+            .send({ Body: " A4928456 ", From: "+12223334444" })
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                expect(res.text).to.equal(referral);
+                expect(getConnectCookie(sess).case_id).to.be.undefined;
+                expect(getConnectCookie(sess).known_case).to.be.undefined;
+                done();
             });
         });
 
-        context("with 0 matching court cases", function() {
-            context("with a citation length between 6-25 inclusive", function() {
-                const params = { Body: "B1234567", From: "+12223334444" };
-
-                it("says we couldn't find their case and prompt for reminder", function(done) {
-                    sess.post('/sms')
-                    .send(params)
-                    .expect(200)
-                    .end(function(err, res) {
-                        if (err)  return done(err);
-                        expect(res.text).to.equal('<?xml version="1.0" encoding="UTF-8"?><Response><Message>We could not find that number. It can take several days for a citation number to appear in our system. Would you like us to keep checking for the next ' + process.env.QUEUE_TTL_DAYS + ' days and text you if we find it? (reply YES or NO)</Message></Response>');
-                        done();
-                    });
-                });
-
-                it("sets the case_id and known_case cookies", function(done) {
-                    sess.post('/sms')
-                    .send(params)
-                    .expect(200)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        expect(getConnectCookie(sess).case_id).to.equal(params.Body.trim());
-                        expect(getConnectCookie(sess).known_case).to.be.false;
-                        done();
-                    });
-                });
+        it("replies with the referral for an unknown citation", function(done) {
+            sess.post('/sms')
+            .send({ Body: "B1234567", From: "+12223334444" })
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                expect(res.text).to.equal(referral);
+                expect(getConnectCookie(sess).case_id).to.be.undefined;
+                done();
             });
-
-            context("the citation length is too short", function() {
-                const params = { Body: "12345", From: "+12223334444"  };
-
-                it("says that case id is wrong", function(done) {
-                    sess.post('/sms')
-                    .send(params)
-                    .expect(200)
-                    .end(function(err, res) {
-                        if (err) return done(err);
-                        expect(res.text).to.equal('<?xml version="1.0" encoding="UTF-8"?><Response><Message>Reply with a case or ticket number to sign up for a reminder. Case number length should be 14, example: 1KE-18-01234MO. Ticket number can be 8 to 17 letters and/or numbers in length, example: KETEEP00000123456.</Message></Response>');
-                        expect(getConnectCookie(sess).askedQueued).to.equal(undefined);
-                        expect(getConnectCookie(sess).askedReminder).to.equal(undefined);
-                        expect(getConnectCookie(sess).citationId).to.equal(undefined);
-                        done();
-                    });
-                 });
-             });
         });
 
-        context("Same day court case or or case already happened", function() {
-            const params = { Body: "A4928456", From: "+12223334444"  };
-
-            it("says case is same day", function(done) {
-                const caseDate = moment().add(1, "hours")
-                knex('hearings').del()
-                .then(() => knex('hearings').insert([turnerData("", caseDate)]))
-                .then(() => {
-                    sess.post('/sms').send(params)
-                    .expect(200)
-                    .end(function (err, res) {
-                        if (err) return done(err);
-                        expect(res.text).to.equal(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>We found a case for Frederick Turner scheduled today at ${caseDate.format('h:mm A')}, at CNVCRT. Would you like a courtesy reminder the day before a future hearing? (reply YES or NO)</Message></Response>`);
-                        expect(getConnectCookie(sess).case_id).to.equal(params.Body);
-                        expect(getConnectCookie(sess).known_case).to.be.true;
-                        done();
-                    });
-                });
+        it("replies with the referral for input that is not a case number", function(done) {
+            sess.post('/sms')
+            .send({ Body: "12345", From: "+12223334444" })
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                expect(res.text).to.equal(referral);
+                done();
             });
+        });
 
-            it("says case is already happening (time is now)", function (done) {
-                const caseDate = moment()
-                knex('hearings').del()
-                .then(() => knex('hearings').insert([turnerData("", caseDate)]))
-                .then(() => {
-                    sess.post('/sms').send(params)
-                    .expect(200)
-                    .end(function (err, res) {
-                        if (err) return done(err);
-                        expect(res.text).to.equal(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>We found a case for Frederick Turner scheduled today at ${caseDate.format('h:mm A')}, at CNVCRT. Would you like a courtesy reminder the day before a future hearing? (reply YES or NO)</Message></Response>`);
-                        expect(getConnectCookie(sess).case_id).to.equal(params.Body);
-                        expect(getConnectCookie(sess).known_case).to.be.true;
-                        done();
-                    });
-                });
+        it("still strips emojis and trailing lines before replying", function(done) {
+            sess.post('/sms')
+            .send({ Body: 'A4928456 😁\r\n-Simon', From: "+12223334444" })
+            .expect(200)
+            .end(function(err, res) {
+                if (err) return done(err);
+                expect(res.text).to.equal(referral);
+                done();
             });
+        });
 
-            it("says case is already happening (time in the past)", function (done) {
-                const caseDate = moment().subtract(2, "hours")
-                knex('hearings').del()
-                .then(() => knex('hearings').insert([turnerData("", caseDate)]))
-                .then(() => {
-                    sess.post('/sms').send(params)
-                    .expect(200)
-                    .end(function (err, res) {
-                        if (err) return done(err);
-                        expect(res.text).to.equal(`<?xml version="1.0" encoding="UTF-8"?><Response><Message>We found a case for Frederick Turner scheduled today at ${caseDate.format('h:mm A')}, at CNVCRT. Would you like a courtesy reminder the day before a future hearing? (reply YES or NO)</Message></Response>`);
-                        expect(getConnectCookie(sess).case_id).to.equal(params.Body);
-                        expect(getConnectCookie(sess).known_case).to.be.true;
-                        done();
-                    });
-                });
-            });
+        it("mentions the court system's number and info page", function() {
+            const msg = messages.newServiceReferral();
+            expect(msg).to.contain('(575) 222-8484');
+            expect(msg).to.contain('https://courts.alaska.gov/tos/court-guide-reminders-faq.htm');
         });
     });
 
-    context("with session.case_id", function() {
-        const  new_date = moment().add(5, 'days');
-        // Build json object, serialize, sign, encode [TODO: can we get session-cookie to do this for us?]
+    context("with session.case_id left over from the old sign-up flow", function() {
+        // Build json object, serialize, sign, encode
         var cookieObj = {case_id: turnerData().case_id, known_case: true};
         var cookieb64 = new Buffer(JSON.stringify(cookieObj)).toString('base64');
         var sig = keys.sign('session='+cookieb64);
         var cookieArr = ['session='+cookieb64 + '; session.sig=' + sig + '; Path=/;'];
 
-        describe("User responding askedReminder session", function() {
-            it("YES - creates a request and responds appropriately", function (done) {
-                const params = { Body: " yEs ", From: "+12223334444" };
-                sess.post('/sms').set('Cookie', cookieArr[0]).send(params)
-                .expect(200)
-                .end(function (err, res) {
-                    if (err)  return done(err);
-
-                    expect(res.text).to.equal('<?xml version="1.0" encoding="UTF-8"?><Response><Message>OK. We will text you a courtesy reminder the day before your hearing date. Note that court schedules frequently change. You should always verify your hearing date and time by going to http://courts.alaska.gov.</Message></Response>');
-                    expect(getConnectCookie(sess).case_id).to.be.undefined;
-                    expect(getConnectCookie(sess).known_case).to.be.undefined;
-
-                    knex("requests").select("*")
-                    .then((rows) => {
-                        expect(rows.length).to.equal(1)
-                        const record = rows[0];
-                        expect(record.phone).to.equal(db.encryptPhone('+12223334444'));
-                        expect(record.case_id).to.equal(turnerData().case_id);
-                        expect(record.known_case).to.be.true;
-                        })
-                    .then(done, done)
-                });
-            });
-
-            it("NO - doesn't create a reminder and responds appropriately", function (done) {
-                const params = { Body: " nO ", From: "+12223334444" };
-                sess.post('/sms').set('Cookie', cookieArr).send(params)
-                .expect(200)
-                .end(function (err, res) {
-                    if (err) return done(err);
-                    expect(res.text).to.equal('<?xml version="1.0" encoding="UTF-8"?><Response><Message>You said “No” so we won’t text you a reminder. You can always go to ' + process.env.COURT_PUBLIC_URL + ' for more information about your case and contact information.</Message></Response>');
-                    expect(getConnectCookie(sess).case_id).to.be.undefined;
-                    expect(getConnectCookie(sess).known_case).to.be.undefined;
-                    knex("requests").count('* as count')
-                    .then((rows) => {
-                        expect(rows[0].count).to.equal('0');
-                    })
-                    .then(done, done)
-                });
+        it("YES - replies with the referral and does not create a request", function (done) {
+            sess.post('/sms').set('Cookie', cookieArr[0]).send({ Body: " yEs ", From: "+12223334444" })
+            .expect(200)
+            .end(function (err, res) {
+                if (err)  return done(err);
+                expect(res.text).to.equal(referral);
+                expect(getConnectCookie(sess).case_id).to.be.undefined;
+                knex("requests").count('* as count')
+                .then((rows) => {
+                    expect(rows[0].count).to.equal('0');
+                })
+                .then(done, done)
             });
         });
     });

@@ -1,6 +1,11 @@
 const twilio = require('twilio');
 const moment = require('moment-timezone');
 
+/* The Alaska Court System's own "Court Guide Text Hearing Reminders" service.
+   See https://courts.alaska.gov/tos/text-reminders.htm */
+const COURT_SMS_NUMBER = '(575) 222-8484';
+const COURT_SMS_INFO_URL = 'https://courts.alaska.gov/tos/court-guide-reminders-faq.htm';
+
 /**
  * reduces whitespace to a single space
  *
@@ -103,6 +108,20 @@ function foundItWillRemind(includeSalutation, match) {
 
     return normalizeSpaces(`${(includeSalutation ? salutation : '')}${caseInfo}
         We will send you courtesy reminders the day before${futureHearing}.`);
+}
+
+/**
+ * Tell them the Alaska Court System now runs its own text reminder service
+ * and how to sign up for it. This is the first reply to any text that is not
+ * managing an existing CourtBot subscription (STOP / DELETE).
+ *
+ * @return {String} message.
+ */
+function newServiceReferral() {
+    return normalizeSpaces(`Alaska CourtBot has been replaced by the Alaska Court System's own text reminders.
+        To sign up, text your case number to ${COURT_SMS_NUMBER} and reply YES when asked.
+        You will get a reminder the afternoon before each hearing.
+        Details: ${COURT_SMS_INFO_URL}`);
 }
 
 /**
@@ -244,6 +263,7 @@ module.exports = {
     foundItWillRemind,
     iAmCourtBot,
     invalidCaseNumber,
+    newServiceReferral,
     notFoundAskToKeepLooking,
     weWillKeepLooking,
     weWillRemindYou,
